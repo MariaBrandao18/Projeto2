@@ -8,6 +8,5 @@ public class PacoteCultural extends PacoteViagem {
 		super(nome, destino, duracao, preco, cliente);
 		this.tipo = "Cultural";
 		String detalhes = "Inclui visitas a museus, centros históricos e experiências gastronômicas";
-		pacotes.add(this);
 	}
 }
