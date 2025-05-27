@@ -2,15 +2,14 @@ package classes;
 
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import classes.Cliente;
-import classes.PacoteViagem;
+import conexao_db.ClienteDAO;
 
 public class CadastroCliente {
 	static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	
 	public CadastroCliente(){
-		Cliente cliente1 = new ClienteNacional("Maria", 45612387, "maria@gmail.com", 4567845);
-		clientes.add(cliente1);
+		
+		//clientes.add(cliente1);
 	}
 	
 	
