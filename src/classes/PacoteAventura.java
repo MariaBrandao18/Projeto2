@@ -8,6 +8,5 @@ public class PacoteAventura extends PacoteViagem {
 		super(nome, destino, duracao, preco, cliente);
 		this.tipo = "Aventura";
 		String detalhes = "Inclui trilhas e passeios de jipe";
-		pacotes.add(this);
 	}
 }
