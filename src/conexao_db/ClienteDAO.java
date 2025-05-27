@@ -43,7 +43,7 @@ public class ClienteDAO {
         }
     }
     
-    public void inserirPacote(PacoteViagem pacote) {
+    public void inserirPacote(PacoteViagem pacote) { //arquivo errado, função de adicionar pacotes
     	String sql = "INSERT INTO pacotes (nome, destino, duracao_dias, preco, tipo_pacote) VALUES (?, ?, ?, ?, ?)"; 
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,7 +81,7 @@ public class ClienteDAO {
                 String cpf = rs.getString("cpf");
                 String passaporte = rs.getString("passaporte");
 
-                Cliente cliente;
+                Cliente cliente; //? problema
                 if (cpf != null) {
                     cliente = new ClienteNacional(nome, telefone, email, cpf);
                 } else {
@@ -98,3 +98,5 @@ public class ClienteDAO {
         return lista;
     }
 }
+
+// incluir funções de adicionar e excluir clientes
