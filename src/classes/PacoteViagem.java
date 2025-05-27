@@ -10,9 +10,6 @@ import classes.CadastroPacote;
 
 public abstract class PacoteViagem {
 	
-	private ArrayList<ServicoAdicional> servicosAdicionais = new ArrayList<>();
-	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();
-	
 	//variaveis
 	String nome;
 	String destino;
@@ -28,8 +25,6 @@ public abstract class PacoteViagem {
 		this.duracao = duracao;
 		this.preco = preco;
 		this.cliente = cliente;
-		cliente.adicionarPacote(this);
-		pacotes.add(this);
 		ClienteDAO conectivo = new ClienteDAO();
 		conectivo.inserirPacote(this);
 	}
