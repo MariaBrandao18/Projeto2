@@ -1,4 +1,4 @@
-
+v
 package classes;
 
 import java.util.ArrayList;
@@ -16,11 +16,32 @@ public abstract class ServicoAdicional {
 		servicos.add(this);
 	}
 	
+	
+	
 	//funcoes
 	
-	 public void adicionarServico(ServicoAdicional servico) {
+	 public String getNome() {
+		return nome;
+	}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	public double getPreco() {
+		return preco;
+	}
+	public void setPreco(double preco) {
+		this.preco = preco;
+	}
+	public static ArrayList<ServicoAdicional> getServicos() {
+		return servicos;
+	}
+	public static void setServicos(ArrayList<ServicoAdicional> servicos) {
+		ServicoAdicional.servicos = servicos;
+	}
+	public void adicionarServico(ServicoAdicional servico) {
 	        servicos.add(servico);
 	    }
+	
 	
 	public void listarServicos() {
 		for (ServicoAdicional s : servicos) {
