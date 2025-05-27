@@ -1,10 +1,12 @@
-
 package classes;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JOptionPane;
-import classes.PacoteViagem;
-import classes.Cliente;
+
+import conexao_db.ClienteDAO;
+import conexao_db.PacoteDAO;
 
 public class CadastroPacote {
 	
@@ -20,28 +22,27 @@ public class CadastroPacote {
 	
 	// construindo objetos para testes
 	public CadastroPacote() {
-		Cliente cliente1 = new ClienteNacional("Maria", 45612387, "maria@gmail.com", 4567845);
-		clientes.add(cliente1);
-		PacoteViagem pacote1 = new PacoteAventura("Familia Radical", "Cancun", 7, 15000.00, "Luxuoso", cliente1);
-		pacotes.add(pacote1);
-		Translado = new Translado("Translado",1000);
-		Passeios = new Passeios("Passeios",400);
-		MotoristaParticular = new MotoristaParticular("Motorista particular",800);
-		AluguelCarro = new AluguelCarro("Aluguel de carro",200);
+		
 	}
 	
 	
 	// funcoes relacionadas aos pacotes
 	public void listarPacotes() {
 		JOptionPane.showMessageDialog(null, "Pacote Listado.");
-		for (PacoteViagem p : pacotes) {
-			JOptionPane.showMessageDialog(null, "\nNome: " + p.getNome() +
-		                       "\n | Destino: " + p.getDestino() +
-		                       "\n | Duração: " + p.getDuracao() +
-		                       "\n | Preço: " + p.getPreco() +
-		                       "\n | Tipo: " + p.getTipo());
-		}
-		
+		List<PacoteViagem> pacotes = PacoteDAO.listarTodos();
+    	if(pacotes == null || pacotes.size() == 0) {
+    		JOptionPane.showMessageDialog(null, "Não possui pacotes cadastrados", "Erro", JOptionPane.ERROR_MESSAGE);    		
+    		return;
+    	}
+    	
+    	StringBuilder listaPacote = new StringBuilder();
+    	for(PacoteViagem p: pacotes) {
+    		listaPacote.append("Nome: " + p.getNome() + "\n");
+    		listaPacote.append("Destino: " + p.getDestino() + "\n");
+    		listaPacote.append("Duração: " + p.getDuracao() + "\n");
+    		listaPacote.append("Preco: " + p.getPreco() +"\n");
+    		listaPacote.append("Tipo: " + p.getTipo() +"\n");
+    		listaPacote.append("\n<<<<<<<<<<<<<<<\n");
 	}
 	
 	public void pesquisarPacotes() {
@@ -60,19 +61,29 @@ public class CadastroPacote {
 	}
 	
 	public void excluirPacote() {
-		boolean removido = false;
-		String excluirPacote = JOptionPane.showInputDialog("Digite o Pacote para remover:");
-		for (int i = 0; i < pacotes.size(); i++) {
-	        if (pacotes.get(i).nome.equals(excluirPacote)) {
-	        	pacotes.remove(i);
-				JOptionPane.showMessageDialog(null, "Pacote " + excluirPacote + " removido!");
-				removido = true;
-				break;
-	        }
-		}
-		if(!removido) {
-			JOptionPane.showMessageDialog(null, "Pacote não encontrado ou já removido!");
-		}
+		String nome = JOptionPane.showInputDialog("Digite o nome do Pacote: ");        
+        PacoteViagem pacote = PacoteDAO.buscarPacote(nome);
+
+        StringBuilder dadosPacote = new StringBuilder();
+        dadosPacote.append("Dados do aluno a ser removido:\n");
+        dadosPacote.append("Nome: ").append(pacote.getNome()).append("\n");
+        dadosPacote.append("Destino: ").append(pacote.getDestino()).append("\n");
+        dadosPacote.append("Duracao: ").append(pacote.getDuracao()).append("\n");
+        dadosPacote.append("Preco: ").append(pacote.getPreco()).append("\n");
+        dadosPacote.append("Tipo: ").append(pacote.getTipo());
+        
+        int confirmacao = JOptionPane.showConfirmDialog(null, 
+                dadosPacote.toString() + "\n\nTem certeza de que quer deletar esse pacote?", 
+                "Confirmar Remoção", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+        
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            PacoteDAO.deletarPacote(pacote.getNome());
+            JOptionPane.showMessageDialog(null, "Pacote removido.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Operação cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+        }
 	}
 	
 	// funcoes relacionadas aos servicos
