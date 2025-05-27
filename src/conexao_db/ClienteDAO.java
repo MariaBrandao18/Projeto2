@@ -99,4 +99,5 @@ public class ClienteDAO {
     }
 }
 
-// incluir funções de adicionar e excluir clientes
+// incluir funções de buscar, listar(corrigir) e excluir clientes
+// incluir (em outro arquivo) as mesmas 3 acima para pacotes
