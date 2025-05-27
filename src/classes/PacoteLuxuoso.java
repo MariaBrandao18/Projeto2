@@ -8,6 +8,5 @@ public class PacoteLuxuoso extends PacoteViagem {
 		super(nome, destino, duracao, preco, cliente);
 		this.tipo = "Luxo";
 		String detalhes = "Mais comodidade, viagem de primeira classe e motoristas inclusos";
-		pacotes.add(this);
 	}
 }
