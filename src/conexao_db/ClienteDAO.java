@@ -18,7 +18,6 @@ import classes.PacoteViagem;
 
 
 public class ClienteDAO {
-
 	
     public void inserirCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nome, telefone, email, cpf, passaporte) VALUES (?, ?, ?, ?, ?)";
@@ -42,30 +41,6 @@ public class ClienteDAO {
             e.printStackTrace();
         }
     }
-    
-    public void inserirPacote(PacoteViagem pacote) { //arquivo errado, função de adicionar pacotes
-    	String sql = "INSERT INTO pacotes (nome, destino, duracao_dias, preco, tipo_pacote) VALUES (?, ?, ?, ?, ?)"; 
-        try (Connection conn = Conexao.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, pacote.getNome());
-            stmt.setString(2, pacote.getDestino());
-            stmt.setInt(3, pacote.getDuracao());
-            stmt.setDouble(4, pacote.getPreco());
-
-            if (pacote instanceof PacoteAventura) {
-                stmt.setString(5, "Aventura");
-            } else if (pacote instanceof PacoteLuxuoso){
-                stmt.setString(5, "Luxo"); 
-            } else 
-                stmt.setString(5, "Cultural"); 
-            
-            
-            stmt.executeUpdate();
-            System.out.println("Pacote cadastrado com sucesso!");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public List<Cliente> listar() {
         List<Cliente> lista = new ArrayList<>();
@@ -81,7 +56,7 @@ public class ClienteDAO {
                 String cpf = rs.getString("cpf");
                 String passaporte = rs.getString("passaporte");
 
-                Cliente cliente; //? problema
+                Cliente cliente;
                 if (cpf != null) {
                     cliente = new ClienteNacional(nome, telefone, email, cpf);
                 } else {
@@ -97,7 +72,34 @@ public class ClienteDAO {
 
         return lista;
     }
+    
+    public List<Cliente> getClientePacote(String nome) throws SQLException {
+        List<PacoteViagem> disciplinas = new ArrayList<>();
+        String sql = "SELECT d.* FROM disciplina d " +
+                    "JOIN aluno_disciplina ad ON d.id = ad.disciplina_id " +
+                    "WHERE ad.aluno_id = ?";
+        
+        Connection conn = null;
+        
+        try {
+        	conn = DatabaseConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            
+            stmt.setLong(1, alunoId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Disciplina disciplina = new Disciplina();
+                    disciplina.setId(rs.getLong("id"));
+                    disciplina.setNome(rs.getString("nome"));
+                    disciplina.setCodigo(rs.getString("codigo"));
+                    disciplinas.add(disciplina);
+                }
+            }
+        } finally {
+        	if(conn != null)
+        		DatabaseConnection.desconectar(conn);
+        }
+        return disciplinas;
+    }
 }
-
-// incluir funções de buscar, listar(corrigir) e excluir clientes
-// incluir (em outro arquivo) as mesmas 3 acima para pacotes
