@@ -61,6 +61,13 @@ public abstract class PacoteViagem {
 		}
 		
 	}
+	@Override
+	public String toString(){
+		return "Pacote:" + nome +
+			"Destino: " + destino +
+			"Duração: " + duracao +
+			"Preço: " + preco
+	};
 	
 	public void pesquisarPacotes(String nomeProcura) {
 		for (PacoteViagem p : pacotes) {
