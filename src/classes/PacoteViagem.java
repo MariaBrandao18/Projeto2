@@ -2,109 +2,100 @@ package classes;
 
 import java.util.ArrayList;
 
-import javax.swing.JOptionPane;
-
-import classes.Cliente;
-import conexao_db.ClienteDAO;
-import classes.CadastroPacote;
-
 public abstract class PacoteViagem {
-	
-	//variaveis
-	String nome;
-	String destino;
-	int duracao;
-	double preco;
-	String tipo = null;
-	Cliente cliente;
+	private Long pacote_id;
+	private String nome;
+	private String destino;
+	private int duracao;
+	private double preco;
+	private String tipo = null;
+	private ArrayList<ServicoAdicional> servicosAdicionais = new ArrayList<>();
+	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();
 	
 	// construtor
-	public PacoteViagem(String nome, String destino, int duracao, double preco, Cliente cliente) {
+	public PacoteViagem(Long id, String nome, String destino, int duracao, double preco, Cliente cliente) {
 		this.nome = nome;
 		this.destino = destino;
 		this.duracao = duracao;
 		this.preco = preco;
-		this.cliente = cliente;
-		ClienteDAO conectivo = new ClienteDAO();
-		conectivo.inserirPacote(this);
 	}
 	
-	// getters
+	// getters e setters
+	
+	public Long getPacoteId() {
+        return pacote_id;
+    }
+
+    public void setPacoteId(Long pacote_id) {
+        this.pacote_id = pacote_id;
+    }
+	
+	public ArrayList<ServicoAdicional> getServicosAdicionais() {
+		return servicosAdicionais;
+	}
+
+	public void setServicosAdicionais(ArrayList<ServicoAdicional> servicosAdicionais) {
+		this.servicosAdicionais = servicosAdicionais;
+	}
+
+	public static ArrayList<PacoteViagem> getPacotes() {
+		return pacotes;
+	}
+
+	public static void setPacotes(ArrayList<PacoteViagem> pacotes) {
+		PacoteViagem.pacotes = pacotes;
+	}
+
 	public String getNome() {
 		return nome;
 	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
 	public String getDestino() {
 		return destino;
 	}
+
+	public void setDestino(String destino) {
+		this.destino = destino;
+	}
+
 	public int getDuracao() {
 		return duracao;
 	}
+
+	public void setDuracao(int duracao) {
+		this.duracao = duracao;
+	}
+
 	public double getPreco() {
 		return preco;
 	}
+
+	public void setPreco(double preco) {
+		this.preco = preco;
+	}
+
 	public String getTipo() {
 		return tipo;
 	}
- 	public String getCliente() {
-		return cliente.nome;
-	}
-	
-	// funcoes relacionadas aos pacotes
-	public void listarPacotes() {
-		for (PacoteViagem p : pacotes) {
-		    System.out.println("Nome: " + p.getNome() +
-		                       " | Destino: " + p.getDestino() +
-		                       " | Duração: " + p.getDuracao() +
-		                       " | Preço: " + p.getPreco() +
-		                       " | Tipo: " + p.getTipo() +
-		                       "----------------------------");
-		}
-		
-	}
-	@Override
-	public String toString(){
-		return "Pacote:" + nome +
-			"Destino: " + destino +
-			"Duração: " + duracao +
-			"Preço: " + preco
-	};
-	
-	public void pesquisarPacotes(String nomeProcura) {
-		for (PacoteViagem p : pacotes) {
-			if (p.nome.equals(nomeProcura)) {
-				System.out.println(p.nome + "encontrado!");
-			}
-		}
-	}
-	
-	public void excluirPacote(String nomeExcluir) {
-		for (int i = 0; i < pacotes.size(); i++) {
-	        if (pacotes.get(i).nome.equals(nomeExcluir)) {
-	            System.out.println(pacotes.get(i).nome + " excluído!");
-	            pacotes.remove(i);
-	            return;
-	        }
-		}
-	}
-	
-	// funcoes relacionadas aos servicos
-	
-	 public void adicionarServico(ServicoAdicional servico) {
-	        servicosAdicionais.add(servico);
-	    }
-	public void listarServicos() {
-        if (servicosAdicionais.isEmpty()) {
-            JOptionPane.showMessageDialog(null,
-                "Nenhum serviço adicional para o pacote " + nome);
-            return;
-        }
 
-        StringBuilder mensagem = new StringBuilder("Serviços adicionais para " + nome + ":\n");
-        for (ServicoAdicional s : servicosAdicionais) {
-            mensagem.append(" - ")
-                    .append(s.getNome())
-                    .append(" (R$").append(s.getPreco()).append(")\n");
-        }
-        JOptionPane.showMessageDialog(null, mensagem.toString());
-    }
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
+	
+	public String toString() {
+		return "Pacote{" + "Nome: " + nome + ", Destino: " + destino + ", Duração: " + duracao + ", Preço: " + preco + ", Tipo: " + tipo;
+	}
+
 }
