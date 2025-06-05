@@ -10,7 +10,12 @@ public abstract class PacoteViagem {
 	private double preco;
 	private String tipo = null;
 	private ArrayList<ServicoAdicional> servicosAdicionais = new ArrayList<>();
+	private Cliente cliente;
 	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();
+	
+	public PacoteViagem() {
+		
+	}
 	
 	// construtor
 	public PacoteViagem(Long id, String nome, String destino, int duracao, double preco, Cliente cliente) {
