@@ -4,9 +4,10 @@ public class PacoteLuxuoso extends PacoteViagem {
 	
 	String tipo;
 	
-	public PacoteLuxuoso(String nome, String destino, int duracao, double preco, String tipo, Cliente cliente) {
-		super(nome, destino, duracao, preco, cliente);
+	public PacoteLuxuoso(Long pacote_id, String nome, String destino, int duracao, double preco, String tipo, Cliente cliente) {
+		super(pacote_id, nome, destino, duracao, preco, cliente);
 		this.tipo = "Luxo";
-		String detalhes = "Mais comodidade, viagem de primeira classe e motoristas inclusos";
+		//String detalhes = "Mais comodidade, viagem de primeira classe e motoristas inclusos";
+		pacotes.add(this);
 	}
 }
