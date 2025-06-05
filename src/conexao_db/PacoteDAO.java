@@ -4,15 +4,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import classes.PacoteAventura;
-import classes.PacoteLuxuoso;
-import classes.PacoteViagem;
+import classes.*;
 
 import conexao_db.Conexao;
 
 public class PacoteDAO {
 	
-	public void inserirPacote(PacoteViagem pacote) {
+	public static void inserirPacote(PacoteViagem pacote) {
     	String sql = "INSERT INTO pacotes (nome, destino, duracao_dias, preco, tipo_pacote) VALUES (?, ?, ?, ?, ?)";
     	Connection conn = null;
         try {
@@ -47,7 +45,7 @@ public class PacoteDAO {
         }
     }
 	
-	public List<PacoteViagem> listarTodos() throws SQLException {
+	public static List<PacoteViagem> listarTodos() throws SQLException {
         List<PacoteViagem> pacotes = new ArrayList<>();
         String sql = "SELECT * FROM pacotes";
         Connection conn = null;
@@ -58,13 +56,30 @@ public class PacoteDAO {
              ResultSet rs = stmt.executeQuery(sql);
             
             while (rs.next()) {
-                PacoteViagem p = new PacoteViagem();
-                p.setNome(rs.getString("nome"));
-                p.setDuracao(rs.getInt("duracao"));
-                p.setDestino(rs.getString("destino"));
-                p.setPreco(rs.getDouble("preco"));
-                p.setTipo(rs.getString("tipo"));
-                p.add(pacotes);
+            	PacoteViagem p;
+            	String tipo = rs.getString("tipo_pacote");
+                String nome = rs.getString("nome");
+                String destino = rs.getString("destino");
+                int duracao = rs.getInt("duracao_dias");
+                double preco = rs.getDouble("preco");
+                
+                switch(tipo) {
+                	case "Aventura":
+                		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
+                		break;
+                	case "Luxuoso":
+                		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
+                		break;
+                	case "Cultural":
+                		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
+                		break;
+                	default:
+                        throw new IllegalArgumentException("Tipo de pacote desconhecido: " + tipo);
+                }
+                
+                p.setPacoteId(rs.getLong("id"));
+                p.setTipo(tipo);
+                pacotes.add(p);
             }
         } finally {
         	if(conn != null)
@@ -73,7 +88,7 @@ public class PacoteDAO {
         return pacotes;
     }
 	
-	public PacoteViagem buscarPacote(String nome) throws SQLException{
+	public static PacoteViagem buscarPacote(String nome) throws SQLException{
 		String sql = "SELECT * FROM pacotes WHERE nome = ?";
         Connection conn = null;
         try {
@@ -83,14 +98,29 @@ public class PacoteDAO {
         	 
         	 try(ResultSet rs = stmt.executeQuery()){
         		 if(rs.next()) {
-        			 PacoteViagem pacote = new PacoteViagem();
-        			 pacote.setPacoteId(rs.getLong("id"));
-        			 pacote.setNome(rs.getString("nome"));
-        			 pacote.setDestino(rs.getString("destino"));
-        			 pacote.setDuracao(rs.getInt("duracao"));
-        			 pacote.setPreco(rs.getDouble("preco"));
-        			 pacote.setTipo(rs.getString("tipo"));
-                     return pacote;
+        			 PacoteViagem pacote;
+                     String tipo = rs.getString("tipo_pacote");
+                     String destino = rs.getString("destino");
+                     int duracao = rs.getInt("duracao_dias");
+                     double preco = rs.getDouble("preco");
+                     
+                     switch(tipo) {
+                     case "Aventura":
+                         pacote = new PacoteAventura(null, nome, destino, duracao, preco, null, null);
+                         break;
+                     case "Luxuoso":
+                         pacote = new PacoteLuxuoso(null, nome, destino, duracao, preco, null, null);
+                         break;
+                     case "Cultural":
+                         pacote = new PacoteCultural(null, nome, destino, duracao, preco, null, null);
+                         break;
+                     default:
+                         throw new IllegalArgumentException("Tipo de pacote desconhecido: " + tipo);
+                 }
+                 
+                 pacote.setPacoteId(rs.getLong("id"));
+                 pacote.setTipo(tipo);
+                 return pacote;
         		 }
         	 }
         } catch (SQLException e) {
@@ -104,7 +134,7 @@ public class PacoteDAO {
 		return null;
 	}
 	
-	public void deletarPacote (String nome) throws SQLException {
+	public static void deletarPacote (String nome) throws SQLException {
 		String sql = "DELETE FROM pacotes WHERE nome = ?";
 		Connection conn = null;
 		
