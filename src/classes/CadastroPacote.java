@@ -1,5 +1,6 @@
 package classes;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +13,7 @@ public class CadastroPacote {
 	
 	// declarando listas & servicos
 	static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
-	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();
-	
-	private ServicoAdicional Translado;
-	private ServicoAdicional Passeios;
-	private ServicoAdicional MotoristaParticular;
-	private ServicoAdicional AluguelCarro;
-	
+	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();	
 	
 	// construindo objetos para testes
 	public CadastroPacote() {
@@ -27,7 +22,7 @@ public class CadastroPacote {
 	
 	
 	// funcoes relacionadas aos pacotes
-	public void listarPacotes() {
+	public static void listarPacotes() throws SQLException{
 		JOptionPane.showMessageDialog(null, "Pacote Listado.");
 		List<PacoteViagem> pacotes = PacoteDAO.listarTodos();
     	if(pacotes == null || pacotes.size() == 0) {
@@ -42,25 +37,38 @@ public class CadastroPacote {
     		listaPacote.append("Duração: " + p.getDuracao() + "\n");
     		listaPacote.append("Preco: " + p.getPreco() +"\n");
     		listaPacote.append("Tipo: " + p.getTipo() +"\n");
-    		listaPacote.append("\n<<<<<<<<<<<<<<<\n");
+    		listaPacote.append("\n<<<<<<<<<<<<<<<\n");}
 	}
 	
-	public void pesquisarPacotes() {
+	public void pesquisarPacotes() throws SQLException {
 		String nome = JOptionPane.showInputDialog("Digite o nome ou o destino:");
-		for (PacoteViagem p : pacotes) {
-			if (p.nome.equals(nome) || p.destino.equals(nome)) {
-				JOptionPane.showMessageDialog(null, "Pacote Encontrado! "
-						+  "\n | Nome: " + p.getNome() +
-	                       "\n | Destino: " + p.getDestino() +
-	                       "\n | Duração: " + p.getDuracao() +
-	                       "\n | Preço: " + p.getPreco() +
-	                       "\n | Tipo: " + p.getTipo() +
-	                       "\n | Cliente Relacionado: " + p.getCliente());
-			}
-		}
+		PacoteViagem p = PacoteDAO.buscarPacote(nome);
+		
+		if (p == null) {
+	        List<PacoteViagem> todosPacotes = PacoteDAO.listarTodos();
+	        for (PacoteViagem pacote : todosPacotes) {
+	            if (pacote.getDestino().equalsIgnoreCase(nome)) {
+	                p = pacote;
+	                break;
+	            }
+	        }
+	    }
+	    
+	    if (p != null) {
+	        JOptionPane.showMessageDialog(null, "Pacote Encontrado! "
+	                + "\n | Nome: " + p.getNome() +
+	                "\n | Destino: " + p.getDestino() +
+	                "\n | Duração: " + p.getDuracao() +
+	                "\n | Preço: " + p.getPreco() +
+	                "\n | Tipo: " + p.getTipo() +
+	                "\n | Cliente Relacionado: " + (p.getCliente() != null ? p.getCliente() : "Nenhum"));
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Nenhum pacote encontrado com nome ou destino: " + nome, 
+	                                   "Não encontrado", JOptionPane.INFORMATION_MESSAGE);
+	    }
 	}
 	
-	public void excluirPacote() {
+	public  void excluirPacote() throws SQLException{
 		String nome = JOptionPane.showInputDialog("Digite o nome do Pacote: ");        
         PacoteViagem pacote = PacoteDAO.buscarPacote(nome);
 
@@ -87,57 +95,78 @@ public class CadastroPacote {
 	}
 	
 	// funcoes relacionadas aos servicos
-	public void incluirServico() {
-		String nome = JOptionPane.showInputDialog("Digite o nome ou destino do pacote:");
-		PacoteViagem pacoteEncontrado = null;
-		for (PacoteViagem p : pacotes) {
-			if (p.nome.equals(nome) || p.destino.equals(nome)) {
-				pacoteEncontrado = p;
-				break;
-			}
-		}
-		String[] opcoesServico = {"Translado", "Passeios", "Motorista Particular", "Aluguel de carro", "Cancelar"};
-	       int opcao;
-	       do {
-	           opcao = JOptionPane.showOptionDialog(
-	               null,
-	               "Servicos Adicionais",
-	               "Menu",
-	               JOptionPane.DEFAULT_OPTION,
-	               JOptionPane.INFORMATION_MESSAGE,
-	               null,
-	               opcoesServico,
-	               opcoesServico[0]
-	           );
-	          
-	           switch (opcao) {
-	               case 0:
-	            	   pacoteEncontrado.adicionarServico(Translado);
-	            	   JOptionPane.showMessageDialog(null, "Translado incluso no pacote!");
-	            	   pacoteEncontrado.listarServicos();
-	                   break;
-	               case 1:
-	            	   pacoteEncontrado.adicionarServico(Passeios);
-	            	   JOptionPane.showMessageDialog(null, "Passeios adicionais inclusos no pacote!");
-	            	   pacoteEncontrado.listarServicos();
-	                   break;
-	               case 2:
-	            	   pacoteEncontrado.adicionarServico(MotoristaParticular);
-	            	   JOptionPane.showMessageDialog(null, "Motorista particular incluso no pacote!");
-	            	   pacoteEncontrado.listarServicos();
-	            	   break;
-	               case 3:
-	            	   pacoteEncontrado.adicionarServico(AluguelCarro);
-	            	   JOptionPane.showMessageDialog(null, "Aluguel de carro incluso no pacote!");
-	            	   pacoteEncontrado.listarServicos();
-	                   break;
-	               case 4:
-	            	   JOptionPane.showMessageDialog(null, "Saindo...");
-	            	   break;
-	               default:
-	                   break;
-	           }
-	       } while (opcao != 4);
+	public void incluirServico() throws SQLException {
+	    String nome = JOptionPane.showInputDialog("Digite o nome ou destino do pacote:");
+	    
+	    PacoteViagem pacoteEncontrado = null;
+	    List<PacoteViagem> todosPacotes = PacoteDAO.listarTodos();
+	    for (PacoteViagem p : todosPacotes) {
+	        if (p.getNome().equalsIgnoreCase(nome) || p.getDestino().equalsIgnoreCase(nome)) {
+	            pacoteEncontrado = p;
+	            break;
+	        }
+	    }
+	    
+	    if (pacoteEncontrado == null) {
+	        JOptionPane.showMessageDialog(null, "Pacote não encontrado!");
+	        return;
+	    }
+	    
+	    ServicoAdicional translado = new Translado("Translado Aeroporto-Hotel", 150.0);
+	    ServicoAdicional passeios = new Passeios("Passeios Turísticos", 200.0);
+	    ServicoAdicional motorista = new MotoristaParticular("Motorista Particular", 300.0);
+	    ServicoAdicional carro = new AluguelCarro("Aluguel de Carro", 250.0);
+	    
+	    String[] opcoesServico = {"Translado", "Passeios", "Motorista Particular", "Aluguel de carro", "Cancelar"};
+	    int opcao;
+	    do {
+	        opcao = JOptionPane.showOptionDialog(
+	            null,
+	            "Servicos Adicionais",
+	            "Menu",
+	            JOptionPane.DEFAULT_OPTION,
+	            JOptionPane.INFORMATION_MESSAGE,
+	            null,
+	            opcoesServico,
+	            opcoesServico[0]
+	        );
+	        
+	        switch (opcao) {
+	            case 0:
+	                pacoteEncontrado.getServicosAdicionais().add(translado);
+	                JOptionPane.showMessageDialog(null, 
+	                    "Translado incluso no pacote! Preço: R$" + translado.getPreco());
+	                break;
+	            case 1:
+	                pacoteEncontrado.getServicosAdicionais().add(passeios);
+	                JOptionPane.showMessageDialog(null, 
+	                    "Passeios adicionais inclusos no pacote! Preço: R$" + passeios.getPreco());
+	                break;
+	            case 2:
+	                pacoteEncontrado.getServicosAdicionais().add(motorista);
+	                JOptionPane.showMessageDialog(null, 
+	                    "Motorista particular incluso no pacote! Preço: R$" + motorista.getPreco());
+	                break;
+	            case 3:
+	                pacoteEncontrado.getServicosAdicionais().add(carro);
+	                JOptionPane.showMessageDialog(null, 
+	                    "Aluguel de carro incluso no pacote! Preço: R$" + carro.getPreco());
+	                break;
+	            case 4:
+	                JOptionPane.showMessageDialog(null, "Saindo...");
+	                break;
+	            default:
+	                break;
+	        }
+	        
+	        StringBuilder servicosAtuais = new StringBuilder("Serviços atuais:\n");
+	        for (ServicoAdicional s : pacoteEncontrado.getServicosAdicionais()) {
+	            servicosAtuais.append("- ").append(s.getNome())
+	                         .append(" (R$").append(s.getPreco()).append(")\n");
+	        }
+	        JOptionPane.showMessageDialog(null, servicosAtuais.toString());
+	        
+	    } while (opcao != 4);
 	}
 	
 
