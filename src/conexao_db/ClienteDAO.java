@@ -1,20 +1,10 @@
 package conexao_db;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import classes.Cliente;
-import classes.ClienteEstrangeiro;
-import classes.ClienteNacional;
-import classes.PacoteAventura;
-import classes.PacoteLuxuoso;
-import classes.PacoteViagem;
+import classes.*;
 
 
 public class ClienteDAO {
@@ -42,12 +32,15 @@ public class ClienteDAO {
         }
     }
 
-    public List<Cliente> listar() {
-        List<Cliente> lista = new ArrayList<>();
+    public List<Cliente> listarClientes() {
+        List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM clientes";
-        try (Connection conn = Conexao.conectar();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        Connection conn = null;
+        
+        try {
+        	conn = Conexao.conectar();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 String nome = rs.getString("nome");
@@ -56,50 +49,128 @@ public class ClienteDAO {
                 String cpf = rs.getString("cpf");
                 String passaporte = rs.getString("passaporte");
 
-                Cliente cliente;
+                Cliente c;
                 if (cpf != null) {
-                    cliente = new ClienteNacional(nome, telefone, email, cpf);
+                    c = new ClienteNacional(null , nome, telefone, email, cpf);
                 } else {
-                    cliente = new ClienteEstrangeiro(nome, telefone, email, passaporte);
+                    c = new ClienteEstrangeiro(null , nome, telefone, email, passaporte);
                 }
-
-                lista.add(cliente);
+                c.setClienteId(rs.getLong("id"));
+                clientes.add(c);
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return lista;
+        return clientes;
     }
     
-    public List<Cliente> getClientePacote(String nome) throws SQLException {
-        List<PacoteViagem> disciplinas = new ArrayList<>();
-        String sql = "SELECT d.* FROM disciplina d " +
-                    "JOIN aluno_disciplina ad ON d.id = ad.disciplina_id " +
-                    "WHERE ad.aluno_id = ?";
+    public List<PacoteViagem> getClientePacote(Long cliente_id) throws SQLException {
+        List<PacoteViagem> pacotesRelacionados = new ArrayList<>();
+        String sql = "SELECT p.* FROM pacotes p " +
+                    "JOIN cliente_pacote cp ON p.pacote_id = cp.pacote_id " +
+                    "WHERE cp.cliente_id = ?";
         
         Connection conn = null;
         
         try {
-        	conn = DatabaseConnection.getConnection();
+        	conn = Conexao.conectar();
             PreparedStatement stmt = conn.prepareStatement(sql);
             
-            stmt.setLong(1, alunoId);
+            stmt.setLong(1, cliente_id);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Disciplina disciplina = new Disciplina();
-                    disciplina.setId(rs.getLong("id"));
-                    disciplina.setNome(rs.getString("nome"));
-                    disciplina.setCodigo(rs.getString("codigo"));
-                    disciplinas.add(disciplina);
+                    String tipo = rs.getString("tipo_pacote");
+                    String nome = rs.getString("nome");
+                    String destino = rs.getString("destino");
+                    int duracao = rs.getInt("duracao_dias");
+                    double preco = rs.getDouble("preco");
+                    
+                    PacoteViagem pacote;
+                    switch (tipo != null ? tipo.toUpperCase() : "") {
+                    case "CULTURAL":
+                        pacote = new PacoteCultural(null , nome, destino, duracao, preco, tipo, null);
+                        break;
+                    case "LUXO":
+                        pacote = new PacoteLuxuoso(null, nome, destino, duracao, preco, tipo, null);
+                        break;
+                    case "AVENTURA":
+                        pacote = new PacoteAventura(null, nome, destino, duracao, preco, tipo, null);
+                        break;
+                    default:
+                    	throw new IllegalArgumentException("Tipo de pacote desconhecido: " + tipo);
+                }   
+                    pacotesRelacionados.add(pacote);
                 }
+                
             }
         } finally {
         	if(conn != null)
-        		DatabaseConnection.desconectar(conn);
+        		Conexao.desconectar(conn);
         }
-        return disciplinas;
+        return pacotesRelacionados;
     }
+    
+    public static void deletarCliente (String nome) throws SQLException {
+		String sql = "DELETE FROM clientes WHERE nome = ?";
+		Connection conn = null;
+		
+		try {
+			conn = Conexao.conectar();
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			
+			stmt.setString(1, nome);
+            stmt.executeUpdate();
+		} finally {
+			if(conn != null) {
+				Conexao.desconectar(conn);
+			}
+		}
+	}
+    
+    public static Cliente buscarCliente(String nome) throws SQLException{
+		String sql = "SELECT * FROM clientes WHERE nome = ?";
+        Connection conn = null;
+        try {
+        	conn = Conexao.conectar();
+        	 PreparedStatement stmt = conn.prepareStatement(sql);
+        	 stmt.setString(1, nome);
+        	 
+        	 try(ResultSet rs = stmt.executeQuery()){
+        		 if(rs.next()) {
+        			 Cliente c;
+                     String telefone = rs.getString("telefone");
+                     String email = rs.getString("email");
+                     String tipo_cliente = rs.getString("tipo_cliente");
+                     String cpf = rs.getString("cpf");
+                     String passaporte = rs.getString("passaporte");
+                     
+                     switch(tipo_cliente) {
+                     case "Aventura":
+                         c = new ClienteNacional(null, nome, telefone, email, cpf);
+                         break;
+                     case "Luxuoso":
+                         c = new ClienteEstrangeiro(null, nome, telefone, email, passaporte);
+                         break;
+                     default:
+                         throw new IllegalArgumentException("Cliente desconhecido: " + tipo_cliente);
+                 }
+                 
+                 c.setClienteId(rs.getLong("id"));
+                 c.setTipo_cliente(tipo_cliente);
+                 return c;
+        		 }
+        	 }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	if(conn != null) {
+        		Conexao.desconectar(conn);
+        	}
+        }
+        
+		return null;
+	}
 }
