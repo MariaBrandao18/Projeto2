@@ -14,7 +14,6 @@ public abstract class PacoteViagem {
 	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();
 	
 	public PacoteViagem() {
-		
 	}
 	
 	// construtor
@@ -24,6 +23,13 @@ public abstract class PacoteViagem {
 		this.duracao = duracao;
 		this.preco = preco;
 	}
+	public PacoteViagem(Long id, String nome, String destino, int duracao, double preco) {
+		this.nome = nome;
+		this.destino = destino;
+		this.duracao = duracao;
+		this.preco = preco;
+	}
+	
 	
 	// getters e setters
 	
