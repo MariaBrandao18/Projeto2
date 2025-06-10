@@ -6,18 +6,99 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import conexao_db.ClienteDAO;
 import conexao_db.PacoteDAO;
 
 public class CadastroPacote {
-	
-	// declarando listas & servicos
 	static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();	
 	
-	// construindo objetos para testes
-	public CadastroPacote() {
-		
+	public void inserirPacote() {
+		String nome = JOptionPane.showInputDialog("Digite o nome do pacote:");
+	    if (nome == null || nome.trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String destino = JOptionPane.showInputDialog("Digite o destino do pacote:");
+	    if (destino == null || destino.trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Destino obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    int duracao = 0;
+	    try {
+	        String duracaoStr = JOptionPane.showInputDialog("Digite a duração do pacote (em dias):");
+	        if (duracaoStr == null || duracaoStr.trim().isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Duração obrigatória!", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        duracao = Integer.parseInt(duracaoStr);
+	    } catch (NumberFormatException e) {
+	        JOptionPane.showMessageDialog(null, "Duração deve ser um número inteiro!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    
+	    double preco = 0;
+	    try {
+	        String precoStr = JOptionPane.showInputDialog("Digite o preço do pacote:");
+	        if (precoStr == null || precoStr.trim().isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Preço obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        preco = Double.parseDouble(precoStr);
+	    } catch (NumberFormatException e) {
+	        JOptionPane.showMessageDialog(null, "Preço deve ser um número válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    
+	    String[] options = {"Aventura", "Cultural", "Luxuoso"};
+	    int tipo = JOptionPane.showOptionDialog(null, 
+	            "Selecione o tipo de pacote:", 
+	            "Tipo de Pacote",
+	            JOptionPane.DEFAULT_OPTION, 
+	            JOptionPane.QUESTION_MESSAGE,
+	            null, 
+	            options, 
+	            options[0]);
+
+	    if (tipo == JOptionPane.CLOSED_OPTION) {
+	        JOptionPane.showMessageDialog(null, "Tipo de pacote obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String[] tipoPacote = {"A", "C", "L"};
+	    String tipoSelecionado = tipoPacote[tipo];
+
+	    PacoteViagem pacoteViagem;
+	    if (tipoSelecionado.equals("A")) {
+	        pacoteViagem = new PacoteAventura(null, nome, destino, duracao, preco);
+	    } else if (tipoSelecionado.equals("C")) {
+	        pacoteViagem = new PacoteCultural(null, nome, destino, duracao, preco);
+	    } else {
+	        pacoteViagem = new PacoteLuxuoso(null, nome, destino, duracao, preco);
+	    }
+	    pacoteViagem.setTipo(tipoSelecionado);
+
+	    StringBuilder confirmacao = new StringBuilder();
+	    confirmacao.append("Confirme os dados do pacote:\n\n");
+	    confirmacao.append("Nome: ").append(nome).append("\n");
+	    confirmacao.append("Destino: ").append(destino).append("\n");
+	    confirmacao.append("Duracao: ").append(duracao).append("\n");
+	    confirmacao.append("Preço: ").append(preco).append("\n");
+	    confirmacao.append("Tipo: ").append(options[tipo]).append("\n");
+
+	    int resposta = JOptionPane.showConfirmDialog(null, 
+	            confirmacao.toString(), 
+	            "Confirmar Cadastro", 
+	            JOptionPane.YES_NO_OPTION, 
+	            JOptionPane.QUESTION_MESSAGE);
+
+	    if (resposta == JOptionPane.YES_OPTION) {
+	        PacoteDAO.inserirPacote(pacoteViagem);
+			JOptionPane.showMessageDialog(null, "Pacote cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Cadastro cancelado.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+	    }
 	}
 	
 	
@@ -40,7 +121,7 @@ public class CadastroPacote {
     		listaPacote.append("\n<<<<<<<<<<<<<<<\n");}
 	}
 	
-	public void pesquisarPacotes() throws SQLException {
+	public static void pesquisarPacotes() throws SQLException {
 		String nome = JOptionPane.showInputDialog("Digite o nome ou o destino:");
 		PacoteViagem p = PacoteDAO.buscarPacote(nome);
 		
@@ -68,7 +149,7 @@ public class CadastroPacote {
 	    }
 	}
 	
-	public  void excluirPacote() throws SQLException{
+	public static  void excluirPacote() throws SQLException{
 		String nome = JOptionPane.showInputDialog("Digite o nome do Pacote: ");        
         PacoteViagem pacote = PacoteDAO.buscarPacote(nome);
 
@@ -95,7 +176,7 @@ public class CadastroPacote {
 	}
 	
 	// funcoes relacionadas aos servicos
-	public void incluirServico() throws SQLException {
+	public static void incluirServico() throws SQLException {
 	    String nome = JOptionPane.showInputDialog("Digite o nome ou destino do pacote:");
 	    
 	    PacoteViagem pacoteEncontrado = null;
