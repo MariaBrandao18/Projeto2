@@ -1,19 +1,15 @@
-package program;
+import java.sql.SQLException;
 
-import java.awt.*;
 import javax.swing.*;
 
-import classes.PacoteViagem;
 import classes.CadastroPacote;
 import classes.CadastroCliente;
-import classes.ServicoAdicional;
 
 public class Main extends JFrame{
 	
-	public void cadastroCliente() {
-		CadastroCliente cadastro = new CadastroCliente();
+	public static void cadastroCliente() throws SQLException {
 		
-		String[] opcoesAdm = {"Listar Cliente", "Buscar Cliente", "Eliminar Cliente", "Listar Cliente-Pacote", "Sair"};
+		String[] opcoesAdm = {"Listar Cliente", "Buscar Cliente", "Eliminar Cliente", "Cadastrar Cliente", "Sair"};
        int opcao;
        do {
            opcao = JOptionPane.showOptionDialog(
@@ -29,16 +25,16 @@ public class Main extends JFrame{
           
            switch (opcao) {
                case 0:                	
-               		cadastro.Listar();
+               		CadastroCliente.ListarCliente();
                    break;
                case 1:
-                   	cadastro.Procurar();
+                   	CadastroCliente.ProcurarCliente();
                    break;
                case 2:
-               		cadastro.Eliminar();
+            	   CadastroCliente.EliminarCliente();
                	break;
                case 3:
-            	   cadastro.clientePacote();
+            	   CadastroCliente.incluirCliente();
             	   break;
                case 4:
                    JOptionPane.showMessageDialog(null, "Saindo...");
@@ -49,8 +45,7 @@ public class Main extends JFrame{
        } while (opcao != 4);
 	}
 	
-	public void cadastroPacote() {
-		CadastroPacote cadastroP = new CadastroPacote();
+	public static void cadastroPacote() throws SQLException {
 		
 		String[] opcoesAdm = {"Listar Pacotes", "Pesquisar Pacotes", "Excluir Pacotes", "Incluir serviço", "Saindo"};
        int opcao;
@@ -68,16 +63,16 @@ public class Main extends JFrame{
           
            switch (opcao) {
                case 0:
-            	   cadastroP.listarPacotes();
+            	   CadastroPacote.listarPacotes();
                    break;
                case 1:
-                   cadastroP.pesquisarPacotes();
+            	   CadastroPacote.pesquisarPacotes();
                    break;
                case 2:
-                   cadastroP.excluirPacote();
+            	   CadastroPacote.excluirPacote();
                    break;
                case 3:
-                   cadastroP.incluirServico();
+            	   CadastroPacote.incluirServico();
                    break;
                case 4:
             	   JOptionPane.showMessageDialog(null, "Saindo...");
@@ -89,8 +84,7 @@ public class Main extends JFrame{
 		
 	}
 	
-	public static void menu() {
-		Main main = new Main();
+	public static void menu() throws SQLException {
        String[] opcoes = {"Cadastro do Cliente", "Cadastro do Pacote", "Sair"};
        int opcao;
        do {
@@ -107,10 +101,10 @@ public class Main extends JFrame{
           
            switch (opcao) {
                case 0:
-                   main.cadastroCliente();
+                   Main.cadastroCliente();
                    break;
                case 1:
-                   main.cadastroPacote();
+                   Main.cadastroPacote();
                    break;
                case 2:
                    JOptionPane.showMessageDialog(null, "Saindo...");
@@ -120,8 +114,7 @@ public class Main extends JFrame{
            }
        } while (opcao != 2);
    }
-	public static void main(String[] args) {
-		Main main = new Main();
-		main.menu();
+	public static void main(String[] args) throws SQLException {
+		Main.menu();
 	}
 }
