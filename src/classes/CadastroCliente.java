@@ -11,9 +11,78 @@ public class CadastroCliente {
 	static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	private static final ClienteDAO clienteDAO = new ClienteDAO();
 	
-	public CadastroCliente(){
-		
-		//clientes.add(cliente1);
+	public static void incluirCliente() throws SQLException {
+	    String nome = JOptionPane.showInputDialog("Digite o nome do cliente:");
+	    if (nome == null || nome.trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String telefone = JOptionPane.showInputDialog("Digite o telefone do cliente:");
+	    if (telefone == null || telefone.trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Telefone obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String email = JOptionPane.showInputDialog("Digite o email do cliente:");
+	    if (email == null || email.trim().isEmpty()) {
+	        JOptionPane.showMessageDialog(null, "Email obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String[] options = {"Nacional", "Estrangeira"};
+	    int tipo = JOptionPane.showOptionDialog(null, 
+	            "Selecione o tipo de cliente:", 
+	            "Tipo de Cliente",
+	            JOptionPane.DEFAULT_OPTION, 
+	            JOptionPane.QUESTION_MESSAGE,
+	            null, 
+	            options, 
+	            options[0]);
+
+	    if (tipo == JOptionPane.CLOSED_OPTION) {
+	        JOptionPane.showMessageDialog(null, "Tipo de cliente obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+
+	    String tipoCliente = (tipo == 0) ? "N" : "E";
+
+	    Cliente cliente;
+	    if (tipoCliente.equals("N")) {
+	        String cpf = JOptionPane.showInputDialog("Digite o CPF do cliente:");
+	        if (cpf == null || cpf.trim().isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "CPF obrigatório para nacional!", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        cliente = new ClienteNacional(null, nome, telefone, email, cpf);
+	    } else {
+	        String passaporte = JOptionPane.showInputDialog("Digite o numero do passaporte do cliente:");
+	        if (passaporte == null || passaporte.trim().isEmpty()) {
+	            JOptionPane.showMessageDialog(null, "Passaporte obrigatório para estrangeiro!", "Erro", JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
+	        cliente = new ClienteEstrangeiro(null, nome, telefone, email, passaporte);
+	    }
+
+	    StringBuilder confirmacao = new StringBuilder();
+	    confirmacao.append("Confirme os dados do cliente:\n\n");
+	    confirmacao.append("Nome: ").append(nome).append("\n");
+	    confirmacao.append("Telefone: ").append(telefone).append("\n");
+	    confirmacao.append("Email: ").append(email).append("\n");
+	    confirmacao.append("Tipo: ").append(tipoCliente.equals("N") ? "Nacional" : "Estrangeiro").append("\n");
+
+	    int resposta = JOptionPane.showConfirmDialog(null, 
+	            confirmacao.toString(), 
+	            "Confirmar Cadastro", 
+	            JOptionPane.YES_NO_OPTION, 
+	            JOptionPane.QUESTION_MESSAGE);
+
+	    if (resposta == JOptionPane.YES_OPTION) {
+	        clienteDAO.inserirCliente(cliente);
+			JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	    } else {
+	        JOptionPane.showMessageDialog(null, "Cadastro cancelado.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
+	    }
 	}
 	
 	
@@ -75,7 +144,7 @@ public class CadastroCliente {
         JOptionPane.showMessageDialog(null, mensagem.toString(), "Dados do Cliente", JOptionPane.INFORMATION_MESSAGE);
 		}
 	
-	public void EliminarCliente() throws SQLException{
+	public static void EliminarCliente() throws SQLException{
 		String nome = JOptionPane.showInputDialog("Digite o nome do Cliente:");
         if (nome == null || nome.trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -85,7 +154,6 @@ public class CadastroCliente {
         Cliente cliente = clienteDAO.buscarCliente(nome);
         if (nome == null) {
             JOptionPane.showMessageDialog(null, "Cliente não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
         }
         
         StringBuilder dadosCliente = new StringBuilder();
@@ -107,34 +175,9 @@ public class CadastroCliente {
             JOptionPane.showMessageDialog(null, "Operação cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
         }
 	}
-	public void InserirDAO(Cliente cliente) {
+	/*public void InserirDAO(Cliente cliente) {
 		CadastroPacote.adicionarCliente(cliente);
 		ClienteDAO conectivo = new ClienteDAO();
 		conectivo.inserirCliente(cliente);
-		}
-	
-	/*public void clientePacote() {
-		String nome = JOptionPane.showInputDialog("Nome do cliente:");
-		boolean clienteEncontrado = false;
-		for(Cliente c: clientes) {
-			if(c.getNome().equals(nome)) {
-				clienteEncontrado = true;
-				if(c.pacoteRelacionado.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "O cliente não possui pacotes cadastrados.");
-				} else {
-					StringBuilder info = new StringBuilder("Pacotes do cliente " + c.getNome() + ":\n");
-	                for (PacoteViagem p : c.pacoteRelacionado) {
-	                    info.append("- ")
-	                        .append(p.getNome()).append(" | ");
-	                }
-	                JOptionPane.showMessageDialog(null, info.toString());
-				}
-				break;
-			} 
-		}
-		if (!clienteEncontrado) {
-	        JOptionPane.showMessageDialog(null, "Cliente não encontrado.");
-	    }
-
-	}*/
+		}*/
 }
