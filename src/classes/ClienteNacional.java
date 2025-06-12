@@ -18,4 +18,9 @@ public class ClienteNacional extends Cliente {
 	public String getCpf() {
 		return cpf;
 	}
+
+	@Override
+	protected String getPassaporte() {
+		return null;
+	}
 }
