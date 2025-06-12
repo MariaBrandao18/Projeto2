@@ -9,7 +9,7 @@ public class Conexao {
 
     private static final String URL = "jdbc:mysql://localhost:3306/db_viagem";
     private static final String USUARIO = "root"; //mudar pro usuario ou deixar como esta caso ele nao tenha sido alterado
-    private static final String SENHA = "senha"; //mudar pra senha do dispositivo
+    private static final String SENHA = "ceub123456"; //mudar pra senha do dispositivo
 
     
     public static Connection conectar() throws SQLException {
