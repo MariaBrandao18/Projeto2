@@ -15,7 +15,7 @@ public class PacoteDAO {
     	Connection conn = null;
         try {
         	conn = Conexao.conectar();
-        	PreparedStatement stmt = conn.prepareStatement(sql);
+        	PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
             stmt.setString(1, pacote.getNome());
             stmt.setString(2, pacote.getDestino());
@@ -23,11 +23,11 @@ public class PacoteDAO {
             stmt.setDouble(4, pacote.getPreco());
 
             if (pacote instanceof PacoteAventura) {
-                stmt.setString(5, "Aventura");
+                stmt.setString(5, "aventura");
             } else if (pacote instanceof PacoteLuxuoso){
-                stmt.setString(5, "Luxo"); 
+                stmt.setString(5, "luxo"); 
             } else 
-                stmt.setString(5, "Cultural"); 
+                stmt.setString(5, "cultural"); 
             
             
             stmt.executeUpdate();
@@ -64,20 +64,20 @@ public class PacoteDAO {
                 double preco = rs.getDouble("preco");
                 
                 switch(tipo) {
-                	case "Aventura":
+                	case "aventura":
                 		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
                 		break;
-                	case "Luxuoso":
+                	case "luxo":
                 		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
                 		break;
-                	case "Cultural":
+                	case "cultural":
                 		p = new PacoteAventura(null, nome, destino, duracao, preco, destino, null);
                 		break;
                 	default:
                         throw new IllegalArgumentException("Tipo de pacote desconhecido: " + tipo);
                 }
                 
-                p.setPacoteId(rs.getLong("id"));
+                p.setPacoteId(rs.getLong("pacote_id"));
                 p.setTipo(tipo);
                 pacotes.add(p);
             }
@@ -105,20 +105,20 @@ public class PacoteDAO {
                      double preco = rs.getDouble("preco");
                      
                      switch(tipo) {
-                     case "Aventura":
+                     case "aventura":
                          pacote = new PacoteAventura(null, nome, destino, duracao, preco, null, null);
                          break;
-                     case "Luxuoso":
+                     case "luxo":
                          pacote = new PacoteLuxuoso(null, nome, destino, duracao, preco, null, null);
                          break;
-                     case "Cultural":
+                     case "cultural":
                          pacote = new PacoteCultural(null, nome, destino, duracao, preco, null, null);
                          break;
                      default:
                          throw new IllegalArgumentException("Tipo de pacote desconhecido: " + tipo);
                  }
                  
-                 pacote.setPacoteId(rs.getLong("id"));
+                 pacote.setPacoteId(rs.getLong("pacote_id"));
                  pacote.setTipo(tipo);
                  return pacote;
         		 }
