@@ -9,7 +9,7 @@ import classes.*;
 
 public class ClienteDAO {
 	
-    public void inserirCliente(Cliente cliente) {
+    public static void inserirCliente(Cliente cliente) {
         String sql = "INSERT INTO clientes (nome, telefone, email, cpf, passaporte) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = Conexao.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -32,7 +32,7 @@ public class ClienteDAO {
         }
     }
 
-    public List<Cliente> listarClientes() {
+    public static List<Cliente> listarClientes() {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM clientes";
         Connection conn = null;
@@ -46,6 +46,7 @@ public class ClienteDAO {
                 String nome = rs.getString("nome");
                 String telefone = rs.getString("telefone");
                 String email = rs.getString("email");
+                String tipo_cliente = rs.getString("tipo_cliente");
                 String cpf = rs.getString("cpf");
                 String passaporte = rs.getString("passaporte");
 
@@ -55,7 +56,7 @@ public class ClienteDAO {
                 } else {
                     c = new ClienteEstrangeiro(null , nome, telefone, email, passaporte);
                 }
-                c.setClienteId(rs.getLong("id"));
+                c.setClienteId(rs.getLong("cliente_id"));
                 clientes.add(c);
             }
 
@@ -66,10 +67,10 @@ public class ClienteDAO {
         return clientes;
     }
     
-    public List<PacoteViagem> getClientePacote(Long cliente_id) throws SQLException {
+    public static List<PacoteViagem> getClientePacote(Long cliente_id) throws SQLException {
         List<PacoteViagem> pacotesRelacionados = new ArrayList<>();
         String sql = "SELECT p.* FROM pacotes p " +
-                    "JOIN cliente_pacote cp ON p.pacote_id = cp.pacote_id " +
+                    "JOIN clientes_pacotes cp ON p.pacote_id = cp.pacote_id " +
                     "WHERE cp.cliente_id = ?";
         
         Connection conn = null;
@@ -113,15 +114,16 @@ public class ClienteDAO {
         return pacotesRelacionados;
     }
     
-    public static void deletarCliente (String nome) throws SQLException {
-		String sql = "DELETE FROM clientes WHERE nome = ?";
+    public static void deletarCliente (String documento) throws SQLException {
+		String sql = "DELETE FROM clientes WHERE cpf = ? OR passaporte = ?";
 		Connection conn = null;
 		
 		try {
 			conn = Conexao.conectar();
 			PreparedStatement stmt = conn.prepareStatement(sql);
 			
-			stmt.setString(1, nome);
+			stmt.setString(1, documento);
+			stmt.setString(2, documento);
             stmt.executeUpdate();
 		} finally {
 			if(conn != null) {
@@ -130,17 +132,19 @@ public class ClienteDAO {
 		}
 	}
     
-    public static Cliente buscarCliente(String nome) throws SQLException{
-		String sql = "SELECT * FROM clientes WHERE nome = ?";
+    public static Cliente buscarCliente(String documento) throws SQLException{
+		String sql = "SELECT * FROM clientes WHERE cpf = ? OR passaporte = ?";
         Connection conn = null;
         try {
         	conn = Conexao.conectar();
         	 PreparedStatement stmt = conn.prepareStatement(sql);
-        	 stmt.setString(1, nome);
+        	 stmt.setString(1, documento);
+        	 stmt.setString(2, documento);
         	 
         	 try(ResultSet rs = stmt.executeQuery()){
         		 if(rs.next()) {
         			 Cliente c;
+        			 String nome = rs.getString("nome");
                      String telefone = rs.getString("telefone");
                      String email = rs.getString("email");
                      String tipo_cliente = rs.getString("tipo_cliente");
@@ -148,17 +152,18 @@ public class ClienteDAO {
                      String passaporte = rs.getString("passaporte");
                      
                      switch(tipo_cliente) {
-                     case "Aventura":
+                     case "nacional":
                          c = new ClienteNacional(null, nome, telefone, email, cpf);
                          break;
-                     case "Luxuoso":
+                     case "estrangeiro":
                          c = new ClienteEstrangeiro(null, nome, telefone, email, passaporte);
                          break;
                      default:
                          throw new IllegalArgumentException("Cliente desconhecido: " + tipo_cliente);
                  }
                  
-                 c.setClienteId(rs.getLong("id"));
+                 c.setClienteId(rs.getLong("cliente_id"));
+                 
                  c.setTipo_cliente(tipo_cliente);
                  return c;
         		 }
