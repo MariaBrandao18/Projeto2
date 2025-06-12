@@ -19,5 +19,10 @@ public class ClienteEstrangeiro extends Cliente {
 	public String getPassaporte() {
 		return passaporte;
 	}
+
+	@Override
+	protected String getCpf() {
+		return null;
+	}
 	
 }
