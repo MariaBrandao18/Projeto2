@@ -12,7 +12,7 @@ public class CadastroPacote {
 	static ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 	static 	ArrayList<PacoteViagem> pacotes = new ArrayList<PacoteViagem>();	
 	
-	public void inserirPacote() {
+	public static void inserirPacote() {
 		String nome = JOptionPane.showInputDialog("Digite o nome do pacote:");
 	    if (nome == null || nome.trim().isEmpty()) {
 	        JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -104,7 +104,6 @@ public class CadastroPacote {
 	
 	// funcoes relacionadas aos pacotes
 	public static void listarPacotes() throws SQLException{
-		JOptionPane.showMessageDialog(null, "Pacote Listado.");
 		List<PacoteViagem> pacotes = PacoteDAO.listarTodos();
     	if(pacotes == null || pacotes.size() == 0) {
     		JOptionPane.showMessageDialog(null, "Não possui pacotes cadastrados", "Erro", JOptionPane.ERROR_MESSAGE);    		
@@ -119,6 +118,8 @@ public class CadastroPacote {
     		listaPacote.append("Preco: " + p.getPreco() +"\n");
     		listaPacote.append("Tipo: " + p.getTipo() +"\n");
     		listaPacote.append("\n<<<<<<<<<<<<<<<\n");}
+    	
+    	JOptionPane.showMessageDialog(null, listaPacote.toString(), "Pacotes:", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public static void pesquisarPacotes() throws SQLException {
@@ -254,4 +255,7 @@ public class CadastroPacote {
 	public static void adicionarCliente(Cliente cliente) {
 		clientes.add(cliente);
 	}
+
+
+
 }
