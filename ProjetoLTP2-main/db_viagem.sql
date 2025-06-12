@@ -41,17 +41,3 @@ CREATE TABLE pedidos_servicos (
     FOREIGN KEY (pacote_id) REFERENCES pacotes(pacote_id),
     FOREIGN KEY (servico_id) REFERENCES servicos(servico_id)
 );
-
--- trigger para verificar antes de excluir pacotes
-DELIMITER //
-CREATE TRIGGER trigger_revisar_pacote
-BEFORE DELETE ON pacotes
-FOR EACH ROW
-BEGIN
-IF (clientes_pacotes.pacote_id = old.pacote_id)
-THEN
-SIGNAL SQLSTATE '45000'
-SET MESSAGE_TEXT = 'O pacote não pode ser deletado pois está contratado por um cliente.';
-END IF;
-END
-// DELIMITER ;
