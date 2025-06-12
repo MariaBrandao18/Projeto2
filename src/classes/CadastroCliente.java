@@ -97,6 +97,13 @@ public class CadastroCliente {
     	for(Cliente c: clientes) {
     		dadosCliente.append("Nome: " + c.getNome() + "\n");
     		dadosCliente.append("Telefone: " + c.getTelefone() + "\n");
+    		dadosCliente.append("Email: " + c.getEmail() + "\n");
+    		if(c.getCpf() != null) {
+    			dadosCliente.append("CPF: " + c.getCpf());
+    		}
+    		else if(c.getPassaporte() == null) {
+    			dadosCliente.append("Passaporte: " + c.getPassaporte());
+    		}
     		dadosCliente.append("\n----------------\n");
     		dadosCliente.append("Pacotes: \n");
     		List<PacoteViagem> pacotes = clienteDAO.getClientePacote(c.getClienteId());
@@ -112,29 +119,32 @@ public class CadastroCliente {
 	}
 	
 	public static void ProcurarCliente() throws SQLException{
-		String nome = JOptionPane.showInputDialog("Digite o CPF do aluno:");
-        if (nome == null || nome.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+		String documento = JOptionPane.showInputDialog("Digite o documento(CPF / Passaporte) do cliente:");
+        if (documento == null || documento.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Documento obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        Cliente cliente = clienteDAO.buscarCliente(nome);
+        Cliente cliente = ClienteDAO.buscarCliente(documento);
         if (cliente == null) {
             JOptionPane.showMessageDialog(null, "Cliente não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
         StringBuilder mensagem = new StringBuilder();
-        mensagem.append("Dados do aluno:\n");
+        mensagem.append("Dados do cliente:\n");
         mensagem.append("Nome: ").append(cliente.getNome()).append("\n");
         mensagem.append("Telefone: ").append(cliente.getTelefone()).append("\n");
-        //mensagem.append("CPF: ").append(cliente.getCpf()).append("\n");
-        
-        // Adicionar disciplinas
+        if(cliente.getCpf() != null) {
+			mensagem.append("CPF: " + cliente.getCpf() + "\n");
+		}
+		else if(cliente.getPassaporte() == null) {
+			mensagem.append("Passaporte: " + cliente.getPassaporte() + "\n");
+		}
         List<PacoteViagem> pacotes = clienteDAO.getClientePacote(cliente.getClienteId());
         mensagem.append("Pacotes cadastrados:\n");
         if (pacotes.isEmpty()) {
-            mensagem.append("Nenhuma disciplina matriculada.");
+            mensagem.append("Nenhum pacote associado.");
         } else {
             for (PacoteViagem p : pacotes) {
                 mensagem.append("- ").append(p.getNome()).append(" (").append(p.getPacoteId()).append(")\n");
@@ -145,23 +155,24 @@ public class CadastroCliente {
 		}
 	
 	public static void EliminarCliente() throws SQLException{
-		String nome = JOptionPane.showInputDialog("Digite o nome do Cliente:");
-        if (nome == null || nome.trim().isEmpty()) {
+		String documento = JOptionPane.showInputDialog("Digite o documento do Cliente:");
+        if (documento == null || documento.trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        Cliente cliente = clienteDAO.buscarCliente(nome);
-        if (nome == null) {
+        Cliente cliente = ClienteDAO.buscarCliente(documento);
+        if (cliente == null) {
             JOptionPane.showMessageDialog(null, "Cliente não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        
+       
         StringBuilder dadosCliente = new StringBuilder();
         dadosCliente.append("Nome: " + cliente.getNome() + "\n");
 		dadosCliente.append("Telefone: " + cliente.getTelefone() + "\n");
 		dadosCliente.append("\n----------------\n");
 		dadosCliente.append("Pacotes: \n");
-        
+		
         int confirmacao = JOptionPane.showConfirmDialog(null, 
         		dadosCliente.toString() + "\n\nTem certeza que deseja remover este cliente?", 
                 "Confirmar Remoção", 
@@ -169,15 +180,10 @@ public class CadastroCliente {
                 JOptionPane.WARNING_MESSAGE);
         
         if (confirmacao == JOptionPane.YES_OPTION) {
-            clienteDAO.deletarCliente(cliente.getNome());
+            ClienteDAO.deletarCliente(cliente.getNome());
             JOptionPane.showMessageDialog(null, "Cliente removido.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Operação cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
         }
 	}
-	/*public void InserirDAO(Cliente cliente) {
-		CadastroPacote.adicionarCliente(cliente);
-		ClienteDAO conectivo = new ClienteDAO();
-		conectivo.inserirCliente(cliente);
-		}*/
 }
