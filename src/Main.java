@@ -47,7 +47,7 @@ public class Main extends JFrame{
 	
 	public static void cadastroPacote() throws SQLException {
 		
-		String[] opcoesAdm = {"Listar Pacotes", "Pesquisar Pacotes", "Excluir Pacotes", "Incluir serviço", "Saindo"};
+		String[] opcoesAdm = {"Inserir Pacote", "Listar Pacotes", "Pesquisar Pacotes", "Excluir Pacotes", "Incluir serviço", "Saindo"};
        int opcao;
        do {
            opcao = JOptionPane.showOptionDialog(
@@ -62,25 +62,27 @@ public class Main extends JFrame{
            );
           
            switch (opcao) {
-               case 0:
+           	case 0: 
+        	   CadastroPacote.inserirPacote();
+               case 1:
             	   CadastroPacote.listarPacotes();
                    break;
-               case 1:
+               case 2:
             	   CadastroPacote.pesquisarPacotes();
                    break;
-               case 2:
+               case 3:
             	   CadastroPacote.excluirPacote();
                    break;
-               case 3:
+               case 4:
             	   CadastroPacote.incluirServico();
                    break;
-               case 4:
+               case 5:
             	   JOptionPane.showMessageDialog(null, "Saindo...");
             	   break;
                default:
                    break;
            }
-       } while (opcao != 4);
+       } while (opcao != 5);
 		
 	}
 	
