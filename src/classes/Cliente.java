@@ -69,6 +69,9 @@ public abstract class Cliente {
 	public void setTipo_cliente(String tipo_cliente) {
 		this.tipo_cliente = tipo_cliente;
 	}
-	
-}
 
+	abstract String getCpf();
+	
+	abstract String getPassaporte();
+
+}
