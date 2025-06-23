@@ -178,4 +178,66 @@ public class ClienteDAO {
         
 		return null;
 	}
+    public static void incluirPacote(String pacote, String documento) throws SQLException {
+        String sqlSelectCliente = "SELECT cliente_id FROM clientes WHERE cpf = ? OR passaporte = ?";
+        String sqlSelectPacote = "SELECT pacote_id FROM pacotes WHERE nome = ?";
+        String sqlInsertVinculo = "INSERT INTO clientes_pacotes (cliente_id, pacote_id) VALUES (?, ?)";
+        
+        Connection conn = null;
+
+        try {
+            conn = Conexao.conectar();
+            conn.setAutoCommit(false);
+
+            int clienteId = -1;
+            int pacoteId = -1;
+
+                        try (PreparedStatement stmtCliente = conn.prepareStatement(sqlSelectCliente)) {
+                stmtCliente.setString(1, documento);
+                stmtCliente.setString(2, documento);
+                try (ResultSet rs = stmtCliente.executeQuery()) {
+                    if (rs.next()) {
+                        clienteId = rs.getInt("cliente_id");
+                    } else {
+                        throw new SQLException("Cliente não encontrado com o documento informado.");
+                    }
+                }
+            }
+
+                        try (PreparedStatement stmtPacote = conn.prepareStatement(sqlSelectPacote)) {
+                stmtPacote.setString(1, pacote);
+                try (ResultSet rs = stmtPacote.executeQuery()) {
+                    if (rs.next()) {
+                        pacoteId = rs.getInt("pacote_id");
+                    } else {
+                        throw new SQLException("Pacote não encontrado com o nome informado.");
+                    }
+                }
+            }
+
+                        try (PreparedStatement stmtVinculo = conn.prepareStatement(sqlInsertVinculo)) {
+                stmtVinculo.setInt(1, clienteId);
+                stmtVinculo.setInt(2, pacoteId);
+                stmtVinculo.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+            throw e;
+        } finally {
+            if (conn != null) {
+                Conexao.desconectar(conn);
+            }
+        }
+    }
+
 }
