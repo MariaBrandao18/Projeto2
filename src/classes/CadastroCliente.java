@@ -186,4 +186,18 @@ public class CadastroCliente {
             JOptionPane.showMessageDialog(null, "Operação cancelada.", "Cancelado", JOptionPane.INFORMATION_MESSAGE);
         }
 	}
-}
+	public static void CadastrarPacote() throws SQLException{
+		String documento = JOptionPane.showInputDialog("Digite o documento do Cliente:");
+		if (documento == null || documento.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Documento obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+		String nomePacote = JOptionPane.showInputDialog("Digite o documento do Cliente:");
+		if (nomePacote == null || nomePacote.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Nome obrigatório!", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+		ClienteDAO.incluirPacote(documento, nomePacote);
+        JOptionPane.showMessageDialog(null, nomePacote + " associado com o cliente.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
+}}
